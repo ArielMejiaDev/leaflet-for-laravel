@@ -1,0 +1,21 @@
+<?php
+
+namespace App\Leaflet;
+
+use arielmejiadev\LeafletForLaravel\LeafletMap;
+use arielmejiadev\LeafletForLaravel\Map;
+use arielmejiadev\LeafletForLaravel\Marker;
+
+class {{ class }}
+{
+    public function build(): Map
+    {
+        return LeafletMap::of('{{ id }}')
+            ->center(39.10995, -84.53747)
+            ->zoom(15)
+            ->marker(39.10995, -84.53747, fn (Marker $pin) => $pin
+                ->popup('<b>Cincinnati Union Terminal</b><br>Museum Center')
+                ->icon('blue')
+            );
+    }
+}

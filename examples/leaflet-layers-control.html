@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leaflet Layers Control Example</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+        crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+        crossorigin=""></script>
+    <style>
+        body { margin: 0; padding: 0; }
+        #map { height: 100vh; }
+    </style>
+</head>
+<body>
+    <div id="map"></div>
+    <script>
+        var shadowUrl = 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png';
+        var iconBase = 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-';
+
+        var icons = {
+            blue:  L.icon({ iconUrl: iconBase + 'blue.png',  shadowUrl: shadowUrl, iconSize: [25, 41], iconAnchor: [12, 41], popupAnchor: [1, -34], shadowSize: [41, 41] }),
+            green: L.icon({ iconUrl: iconBase + 'green.png', shadowUrl: shadowUrl, iconSize: [25, 41], iconAnchor: [12, 41], popupAnchor: [1, -34], shadowSize: [41, 41] }),
+            red:   L.icon({ iconUrl: iconBase + 'red.png',   shadowUrl: shadowUrl, iconSize: [25, 41], iconAnchor: [12, 41], popupAnchor: [1, -34], shadowSize: [41, 41] })
+        };
+
+        var locations = [
+            { lat: 40.8260, lng: -96.7270,  address: '4611 West Adams',      city: 'Lincoln',         state: 'NE', pin: 'blue'  },
+            { lat: 41.9500, lng: -97.2260,  address: '84198 562nd Ave',       city: 'Stanton',         state: 'NE', pin: 'blue'  },
+            { lat: 41.4180, lng: -99.1340,  address: '80025 463rd Ave',       city: 'Arcadia',         state: 'NE', pin: 'blue'  },
+            { lat: 40.6230, lng: -95.1180,  address: '1003 Iowa Ave',         city: 'College Springs', state: 'IA', pin: 'green' },
+            { lat: 42.9780, lng: -95.6880,  address: '4375 Pierce Ave',       city: 'Paullina',        state: 'IA', pin: 'green' },
+            { lat: 35.1107, lng: -106.5554, address: '4625 Wyoming Blvd NE',  city: 'Albuquerque',     state: 'NM', pin: 'red'   },
+            { lat: 35.6672, lng: -105.9600, address: '1090 S St Francis Dr',  city: 'Santa Fe',        state: 'NM', pin: 'red'   }
+        ];
+
+        // Group locations by state into layer groups
+        var groups = {};
+        locations.forEach(function(loc) {
+            if (!groups[loc.state]) groups[loc.state] = [];
+            var marker = L.marker([loc.lat, loc.lng], { icon: icons[loc.pin] })
+                .bindPopup('<b>' + loc.address + '</b><br>' + loc.city + ', ' + loc.state);
+            groups[loc.state].push(marker);
+        });
+
+        var neLayer = L.layerGroup(groups['NE']);
+        var iaLayer = L.layerGroup(groups['IA']);
+        var nmLayer = L.layerGroup(groups['NM']);
+
+        // Base tile layers
+        var osm = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+        });
+
+        var osmHOT = L.tileLayer('https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, Tiles style by Humanitarian OpenStreetMap Team hosted by OpenStreetMap France'
+        });
+
+        var openTopoMap = L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
+            maxZoom: 17,
+            attribution: 'Map data: &copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, SRTM | Map style: &copy; <a href="https://opentopomap.org">OpenTopoMap</a> (CC-BY-SA)'
+        });
+
+        // Initialize map with default base layer and all overlays visible
+        var map = L.map('map', {
+            layers: [osm, neLayer, iaLayer, nmLayer]
+        });
+
+        // Fit to all markers
+        var allMarkers = [].concat(groups['NE'], groups['IA'], groups['NM']);
+        map.fitBounds(L.featureGroup(allMarkers).getBounds().pad(0.2));
+
+        // Layer control: base maps (radio) + overlays (checkboxes)
+        var baseMaps = {
+            "OpenStreetMap": osm,
+            "OpenStreetMap HOT": osmHOT,
+            "OpenTopoMap": openTopoMap
+        };
+
+        var overlayMaps = {
+            "Nebraska (NE)": neLayer,
+            "Iowa (IA)": iaLayer,
+            "New Mexico (NM)": nmLayer
+        };
+
+        L.control.layers(baseMaps, overlayMaps).addTo(map);
+    </script>
+</body>
+</html>

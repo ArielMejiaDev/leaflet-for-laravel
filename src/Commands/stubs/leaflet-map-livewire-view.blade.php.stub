@@ -1,0 +1,4 @@
+<div>
+    {{-- To enable polling, add wire:poll.5s="refreshMap" to the div above --}}
+    {!! $mapHtml !!}
+</div>

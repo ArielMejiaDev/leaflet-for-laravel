@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leaflet Map - Lincoln, NE</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+        crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+        crossorigin=""></script>
+    <style>
+        body { margin: 0; padding: 0; }
+        #map { height: 100vh; }
+    </style>
+</head>
+<body>
+    <div id="map"></div>
+    <script>
+        var map = L.map('map');
+
+        L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+        }).addTo(map);
+
+        var shadowUrl = 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png';
+        var iconBase = 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-';
+
+        var icons = {
+            blue:  L.icon({ iconUrl: iconBase + 'blue.png',  shadowUrl: shadowUrl, iconSize: [25, 41], iconAnchor: [12, 41], popupAnchor: [1, -34], shadowSize: [41, 41] }),
+            green: L.icon({ iconUrl: iconBase + 'green.png', shadowUrl: shadowUrl, iconSize: [25, 41], iconAnchor: [12, 41], popupAnchor: [1, -34], shadowSize: [41, 41] }),
+            red:   L.icon({ iconUrl: iconBase + 'red.png',   shadowUrl: shadowUrl, iconSize: [25, 41], iconAnchor: [12, 41], popupAnchor: [1, -34], shadowSize: [41, 41] })
+        };
+
+        var circleColors = {
+            blue:  { color: 'blue',  fillColor: '#3388ff' },
+            green: { color: 'green', fillColor: '#33ff88' },
+            red:   { color: 'red',   fillColor: '#ff3333' }
+        };
+
+        var locations = [
+            { lat: 40.8260, lng: -96.7270, address: '4611 West Adams',      city: 'Lincoln',         state: 'NE', pin: 'blue'  },
+            { lat: 41.9500, lng: -97.2260, address: '84198 562nd Ave',       city: 'Stanton',         state: 'NE', pin: 'blue'  },
+            { lat: 41.4180, lng: -99.1340, address: '80025 463rd Ave',       city: 'Arcadia',         state: 'NE', pin: 'blue'  },
+            { lat: 40.6230, lng: -95.1180, address: '1003 Iowa Ave',         city: 'College Springs', state: 'IA', pin: 'green' },
+            { lat: 42.9780, lng: -95.6880, address: '4375 Pierce Ave',       city: 'Paullina',        state: 'IA', pin: 'green' },
+            { lat: 35.1107, lng: -106.5554, address: '4625 Wyoming Blvd NE', city: 'Albuquerque',     state: 'NM', pin: 'red'   },
+            { lat: 35.6672, lng: -105.9600, address: '1090 S St Francis Dr', city: 'Santa Fe',        state: 'NM', pin: 'red'   }
+        ];
+
+        function addPin(loc) {
+            var marker = L.marker([loc.lat, loc.lng], { icon: icons[loc.pin] }).addTo(map);
+            marker.bindPopup('<b>' + loc.address + '</b><br>' + loc.city + ', ' + loc.state);
+
+            var colors = circleColors[loc.pin];
+            L.circle([loc.lat, loc.lng], {
+                color: colors.color,
+                fillColor: colors.fillColor,
+                fillOpacity: 0.15,
+                radius: 200
+            }).addTo(map);
+
+            return marker;
+        }
+
+        var markers = locations.map(addPin);
+        map.fitBounds(L.featureGroup(markers).getBounds().pad(0.2));
+    </script>
+</body>
+</html>

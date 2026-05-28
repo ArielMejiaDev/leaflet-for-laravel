@@ -1,0 +1,43 @@
+<?php
+
+namespace App\Livewire;
+
+use arielmejiadev\LeafletForLaravel\LeafletMap;
+use arielmejiadev\LeafletForLaravel\Map;
+use arielmejiadev\LeafletForLaravel\Marker;
+use Livewire\Component;
+
+class {{ class }} extends Component
+{
+    public string $mapHtml = '';
+
+    public function mount(): void
+    {
+        $this->mapHtml = $this->buildMap()->toHtml();
+    }
+
+    public function buildMap(): Map
+    {
+        return LeafletMap::of('{{ id }}')
+            ->center(39.10995, -84.53747)
+            ->zoom(15)
+            ->marker(39.10995, -84.53747, fn (Marker $pin) => $pin
+                ->popup('<b>Cincinnati Union Terminal</b><br>Museum Center')
+                ->icon('blue')
+            );
+    }
+
+    /**
+     * Rebuild the map. Useful with Livewire polling:
+     * <div wire:poll.5s="refreshMap">
+     */
+    public function refreshMap(): void
+    {
+        $this->mapHtml = $this->buildMap()->toHtml();
+    }
+
+    public function render()
+    {
+        return view('livewire.{{ view }}');
+    }
+}
